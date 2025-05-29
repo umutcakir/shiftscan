@@ -1,6 +1,6 @@
 # ShiftSCAN: Systematic Identification of Alternative Chimeric Peptide Sources
 
-A computational pipeline for detecting alternative chimeric and non-chimeric sources of mass spectrometry-identified peptides
+A computational pipeline for detecting alternative chimeric and non-chimeric sources of mass spectrometry-identified peptides.
 
 ---
 
