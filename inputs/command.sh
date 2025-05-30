@@ -1,1 +1,0 @@
-shiftscan --nucleotide_file transcriptome.fasta --peptide_file frameshifted_peptides.fasta
