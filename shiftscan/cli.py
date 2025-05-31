@@ -165,11 +165,11 @@ def process_sequences(fasta1_headers_all, fasta1_sequences_all, fasta2_headers,
             # Store results
             results = {
                 'Type': [],
-                'Frameshift_Position': [],
-                'Segment1': [],
-                'Segment2': [],
+                'Frameshift Position': [],
+                'Segment 1': [],
+                'Segment 2': [],
                 'Gap': [],
-                'Frameshift_Direction': [],
+                'Frameshift Direction': [],
                 'Nucleotide Title': [],
                 'Nucleotide Sequence': [],
                 'Protein Title': [],
@@ -218,11 +218,11 @@ def process_sequences(fasta1_headers_all, fasta1_sequences_all, fasta2_headers,
 
                                 # Add results
                                 results['Type'].append('Frameshift')
-                                results['Frameshift_Position'].append(i)  # 1-based position
-                                results['Segment1'].append(segment1)
-                                results['Segment2'].append(segment2)
+                                results['Frameshift Position'].append(i)  # 1-based position
+                                results['Segment 1'].append(segment1)
+                                results['Segment 2'].append(segment2)
                                 results['Gap'].append(gap_str)
-                                results['Frameshift_Direction'].append(direction)
+                                results['Frameshift Direction'].append(direction)
                                 results['Nucleotide Title'].append(fasta1_headers[b])
                                 results['Nucleotide Sequence'].append(trimmed_seq)
                                 results['Protein Title'].append(fasta2_headers[a])
@@ -253,11 +253,11 @@ def process_sequences(fasta1_headers_all, fasta1_sequences_all, fasta2_headers,
                         trimmed_seq = sequence1
 
                     results['Type'].append('Without frameshift')
-                    results['Frameshift_Position'].append("No Frameshift")
-                    results['Segment1'].append(sequence2)
-                    results['Segment2'].append(" ")
+                    results['Frameshift Position'].append("No Frameshift")
+                    results['Segment 1'].append(sequence2)
+                    results['Segment 2'].append(" ")
                     results['Gap'].append(gap_str)
-                    results['Frameshift_Direction'].append(
+                    results['Frameshift Direction'].append(
                         f'The sequence is present in {frame_name} without any frameshift'
                     )
                     results['Nucleotide Title'].append(fasta1_headers[b])
@@ -514,8 +514,8 @@ def main():
         else:
             # Reorder columns to match specification
             column_order = [
-                'Type', 'Frameshift_Position', 'Segment1', 'Segment2', 'Gap',
-                'Frameshift_Direction', 'Nucleotide Title', 'Nucleotide Sequence',
+                'Type', 'Frameshift Position', 'Segment 1', 'Segment 2', 'Gap',
+                'Frameshift Direction', 'Nucleotide Title', 'Nucleotide Sequence',
                 'Protein Title', 'Protein Sequence', 'Frame Direction',
                 'Truncation for Nucleotide Sequence'
             ]
