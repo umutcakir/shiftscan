@@ -1,4 +1,4 @@
-# ShiftSCAN: Source Confirmation by Alignment and Navigation 
+# ShiftSCAN: Shift detection and Source Confirmation by Alignment and Navigation  
 
 A computational pipeline for detecting alternative chimeric and non-chimeric sources of mass spectrometry-identified peptides.
 
