@@ -273,8 +273,9 @@ def process_sequences(fasta1_headers_all, fasta1_sequences_all, fasta2_headers,
     return results_all
 
 
-def process_sequences_helper(header1, sequence1, fasta2_headers, fasta2_sequences, max_gap,
-                             speed_up_by_blast, blast_output, codon_table, max_transcript_length, max_flanking_seq):
+def process_sequences_helper(args):
+    """Helper function for parallel processing"""
+    header1, sequence1, fasta2_headers, fasta2_sequences, max_gap, speed_up_by_blast, blast_output, codon_table, max_transcript_length, max_flanking_seq = args
     return process_sequences(
         [header1], [sequence1], fasta2_headers, fasta2_sequences, max_gap,
         speed_up_by_blast, blast_output, codon_table, max_transcript_length, max_flanking_seq
@@ -286,24 +287,31 @@ def process_sequences_parallel(fasta1_headers_all, fasta1_sequences_all, fasta2_
                                n_jobs, codon_table, max_transcript_length, max_flanking_seq):
     results_all = pd.DataFrame()
 
-    # Create progress bar
-    with tqdm(total=len(fasta1_headers_all)) as pbar:
-        def update_pbar(result):
-            pbar.update(1)
-            return result
+    # Prepare arguments for parallel processing
+    args_list = [(header1, sequence1, fasta2_headers, fasta2_sequences, max_gap,
+                  speed_up_by_blast, blast_output, codon_table,
+                  max_transcript_length, max_flanking_seq)
+                 for header1, sequence1 in zip(fasta1_headers_all, fasta1_sequences_all)]
 
-        processed_results = Parallel(n_jobs=n_jobs)(
-            delayed(process_sequences_helper)(
-                header1, sequence1, fasta2_headers, fasta2_sequences, max_gap,
-                speed_up_by_blast, blast_output, codon_table,
-                max_transcript_length, max_flanking_seq
-            )
-            for header1, sequence1 in zip(fasta1_headers_all, fasta1_sequences_all)
-        )
+    # Create a tqdm progress bar
+    pbar = tqdm(total=len(args_list), desc="Processing sequences")
 
-        # Collect results
-        for result in processed_results:
-            results_all = pd.concat([results_all, result], ignore_index=True)
+    # Function to update progress bar after each job completes
+    def update_progress(result):
+        pbar.update(1)
+        return result
+
+    # Process in parallel with progress updates
+    processed_results = Parallel(n_jobs=n_jobs)(
+        delayed(update_progress)(process_sequences_helper(args))
+        for args in args_list
+    )
+
+    pbar.close()
+
+    # Collect results
+    for result in processed_results:
+        results_all = pd.concat([results_all, result], ignore_index=True)
 
     return results_all
 
@@ -352,7 +360,7 @@ def main():
     # BLAST parameters
     parser.add_argument('--blast', action='store_true',
                         help='Enable BLAST pre-filtering for acceleration (not recommended)')
-    parser.add_argument('--sensitivity', type=float, default=5.0,
+    parser.add_argument('--threshold', type=float, default=5.0,
                         help='BLAST word inclusion threshold (higher = slower)')
     parser.add_argument('--word_size', type=int, default=2,
                         help='BLAST word size parameter')
@@ -433,7 +441,7 @@ def main():
                 '-seg', 'no',
                 '-soft_masking', 'false',
                 '-word_size', str(args.word_size),
-                '-threshold', str(args.sensitivity),
+                '-threshold', str(args.threshold),
                 '-evalue', str(args.evalue),
                 '-outfmt', '6 qseqid sseqid pident',
                 '-max_target_seqs', str(len(nuc_headers)),
@@ -548,7 +556,7 @@ Max gap size: {args.max_gap}
 Max transcript length: {args.max_transcript_length}
 Max flanking sequence: {args.max_flanking_seq}
 BLAST acceleration: {'Enabled' if args.blast else 'Disabled'}
-BLAST sensitivity: {args.sensitivity}
+BLAST threshold: {args.threshold}
 BLAST word size: {args.word_size}
 BLAST e-value: {args.evalue}
 Reverse complement check: {'Disabled' if args.no_reverse_complement_check else 'Enabled'}
@@ -563,9 +571,5 @@ Processing time: {time.time() - start_time:.2f} seconds
     except Exception as e:
         print(f"⚠️ Failed to save parameters: {str(e)}")
 
-
-def run():
-    main()
-
 if __name__ == "__main__":
-    run()
+    main()
