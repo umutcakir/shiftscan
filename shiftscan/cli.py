@@ -571,5 +571,8 @@ Processing time: {time.time() - start_time:.2f} seconds
     except Exception as e:
         print(f"⚠️ Failed to save parameters: {str(e)}")
 
-if __name__ == "__main__":
+def run():
     main()
+
+if __name__ == "__main__":
+    run()
