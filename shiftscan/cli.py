@@ -285,34 +285,36 @@ def process_sequences_helper(args):
 def process_sequences_parallel(fasta1_headers_all, fasta1_sequences_all, fasta2_headers,
                                fasta2_sequences, max_gap, speed_up_by_blast, blast_output,
                                n_jobs, codon_table, max_transcript_length, max_flanking_seq):
+    """Parallel processing with thread-safe progress bar"""
     results_all = pd.DataFrame()
-
+    
     # Prepare arguments for parallel processing
     args_list = [(header1, sequence1, fasta2_headers, fasta2_sequences, max_gap,
                   speed_up_by_blast, blast_output, codon_table,
                   max_transcript_length, max_flanking_seq)
                  for header1, sequence1 in zip(fasta1_headers_all, fasta1_sequences_all)]
 
-    # Create a tqdm progress bar
+    # Create progress bar
     pbar = tqdm(total=len(args_list), desc="Processing sequences")
-
-    # Function to update progress bar after each job completes
-    def update_progress(result):
-        pbar.update(1)
+    
+    # Wrap processing function with progress update
+    def process_wrapper(args):
+        result = process_sequences_helper(args)
+        pbar.update(1)  # Update progress bar
         return result
 
-    # Process in parallel with progress updates
-    processed_results = Parallel(n_jobs=n_jobs)(
-        delayed(update_progress)(process_sequences_helper(args))
-        for args in args_list
-    )
-
-    pbar.close()
+    try:
+        # Process in parallel
+        processed_results = Parallel(n_jobs=n_jobs)(
+            delayed(process_wrapper)(args) for args in args_list
+        )
+    finally:
+        pbar.close()  # Ensure progress bar closes even on error
 
     # Collect results
     for result in processed_results:
         results_all = pd.concat([results_all, result], ignore_index=True)
-
+        
     return results_all
 
 
