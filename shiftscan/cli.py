@@ -9,6 +9,8 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 import sys
 import re
+import pickle
+import multiprocessing
 
 # Default codon table
 codon_table_default = {
@@ -275,10 +277,14 @@ def process_sequences(fasta1_headers_all, fasta1_sequences_all, fasta2_headers,
 
 def process_sequences_helper(args):
     """Helper function for parallel processing"""
-    header1, sequence1, fasta2_headers, fasta2_sequences, max_gap, speed_up_by_blast, blast_output, codon_table, max_transcript_length, max_flanking_seq = args
+    (header1, sequence1, fasta2_headers, fasta2_sequences, max_gap, 
+     speed_up_by_blast, blast_output, codon_table, 
+     max_transcript_length, max_flanking_seq) = args
+     
     return process_sequences(
         [header1], [sequence1], fasta2_headers, fasta2_sequences, max_gap,
-        speed_up_by_blast, blast_output, codon_table, max_transcript_length, max_flanking_seq
+        speed_up_by_blast, blast_output, codon_table, 
+        max_transcript_length, max_flanking_seq
     )
 
 
@@ -297,19 +303,18 @@ def process_sequences_parallel(fasta1_headers_all, fasta1_sequences_all, fasta2_
     # Create progress bar
     pbar = tqdm(total=len(args_list), desc="Processing sequences")
     
-    # Wrap processing function with progress update
-    def process_wrapper(args):
-        result = process_sequences_helper(args)
-        pbar.update(1)  # Update progress bar
-        return result
+    # Create list to store results
+    processed_results = []
 
     try:
         # Process in parallel
-        processed_results = Parallel(n_jobs=n_jobs)(
-            delayed(process_wrapper)(args) for args in args_list
-        )
+        with multiprocessing.Pool(processes=n_jobs) as pool:
+            # Use imap_unordered for better performance
+            for result in pool.imap_unordered(process_sequences_helper, args_list):
+                processed_results.append(result)
+                pbar.update(1)
     finally:
-        pbar.close()  # Ensure progress bar closes even on error
+        pbar.close()
 
     # Collect results
     for result in processed_results:
