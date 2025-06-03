@@ -288,40 +288,56 @@ def process_sequences_helper(args):
     )
 
 
+# Replace the process_sequences_parallel function with this updated version
 def process_sequences_parallel(fasta1_headers_all, fasta1_sequences_all, fasta2_headers,
                                fasta2_sequences, max_gap, speed_up_by_blast, blast_output,
                                n_jobs, codon_table, max_transcript_length, max_flanking_seq):
-    """Parallel processing with thread-safe progress bar"""
+    """Parallel processing with human-readable progress information"""
     results_all = pd.DataFrame()
-    
-    # Prepare arguments for parallel processing
     args_list = [(header1, sequence1, fasta2_headers, fasta2_sequences, max_gap,
                   speed_up_by_blast, blast_output, codon_table,
                   max_transcript_length, max_flanking_seq)
                  for header1, sequence1 in zip(fasta1_headers_all, fasta1_sequences_all)]
 
-    # Create progress bar
-    pbar = tqdm(total=len(args_list), desc="Processing sequences")
-    
-    # Create list to store results
+    # Create custom progress bar
+    pbar = tqdm(total=len(args_list), desc="Processing sequences", unit="seq")
+    start_time = time.time()
+    processed_count = 0
     processed_results = []
 
     try:
         # Process in parallel
         with multiprocessing.Pool(processes=n_jobs) as pool:
-            # Use imap_unordered for better performance
             for result in pool.imap_unordered(process_sequences_helper, args_list):
                 processed_results.append(result)
+                processed_count += 1
+
+                # Calculate metrics
+                elapsed = time.time() - start_time
+                avg_speed = elapsed / processed_count
+                total_minutes = elapsed / 60
+
+                # Update progress bar with human-readable information
+                pbar.set_postfix_str(
+                    f"Total: {total_minutes:.1f} min for {processed_count} seqs, "
+                    f"Speed: {avg_speed / 60:.1f} min/seq"
+                )
                 pbar.update(1)
     finally:
         pbar.close()
+        total_time = time.time() - start_time
+
+        # Print final summary
+        print(f"  Sequences processed: {processed_count}")
+        print(f"  Total time: {total_time / 60:.1f} minutes")
+        print(f"  Average speed: {total_time / processed_count / 60:.1f} minutes per sequence")
+        print(f"  ({processed_count / (total_time / 60):.2f} sequences per minute)")
 
     # Collect results
     for result in processed_results:
         results_all = pd.concat([results_all, result], ignore_index=True)
-        
-    return results_all
 
+    return results_all
 
 def reverse_complement(sequence):
     complement = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
