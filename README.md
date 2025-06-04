@@ -6,9 +6,8 @@ A computational pipeline for detecting alternative chimeric and non-chimeric sou
 
 ## Overview
 
-ShiftSCAN was developed to advance research on mosaic translation and programmed ribosomal frameshifting. It has enabled the discrimination between chimeric proteins with unique sources in the genome and proteins that have multiple alternative sources, which is essential for their functional analysis. For biological context and related studies, see our publication: Çakır et al. (2024, preprint). 
+ShiftSCAN enables systematic identification of alternative genomic sources for chimeric peptides. The tool addresses critical challenges in programmed ribosomal frameshifting (PRF) studies by: 
 
-ShiftScan addresses critical challenges in programmed ribosomal frameshifting (PRF) studies by:
 - Identifying potential alternative loci for chimeric peptides
 - Differentiating between unique and multi-source chimeric origins
 - Detecting reverse complement translation events
@@ -95,10 +94,10 @@ Contains tabular data on detected chimeric and non-chimeric sequences with these
 > cd shiftscan
 > pip install -e .
 
+ShiftSCAN was developed to advance research on mosaic translation and programmed ribosomal frameshifting. It has enabled the discrimination between chimeric proteins with unique sources in the genome and proteins that have multiple alternative sources, which is essential for their functional analysis. For biological context and related studies, see our publication: Çakır et al. (2024, preprint).
+
 If you use ShiftSCAN in your research, please cite the following article:
-Umut Çakır, Noujoud Gabed, Ali Yurtseven, Igor Kryvoruchko (2025). ShiftSCAN, a program
-that predicts potential alternative sources of mass spectrometry-derived peptides, improves the
-accuracy of studies on novel amino acid sequences. bioRxiv (Cold Spring Harbor Laboratory).
-https://doi.org/10.1101/2025.05.30.656965
-To report bugs, ask questions, or suggest features, feel free to open an issue on GitHub. Your
-feedback and citations help us improve and sustain this tool.
+
+Umut Çakır, Noujoud Gabed, Ali Yurtseven, Igor Kryvoruchko (2025). ShiftSCAN, a program that predicts potential alternative sources of mass spectrometry-derived peptides, improves the accuracy of studies on novel amino acid sequences. bioRxiv (Cold Spring Harbor Laboratory). https://doi.org/10.1101/2025.05.30.656965
+
+To report bugs, ask questions, or suggest features, feel free to open an issue on GitHub. Your feedback and citations help us improve and sustain this tool.
