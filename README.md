@@ -6,7 +6,7 @@ A computational pipeline for detecting alternative chimeric and non-chimeric sou
 
 ## Overview
 
-ShiftSCAN enables systematic identification of alternative genomic sources for chimeric peptides. The tool addresses critical challenges in programmed ribosomal frameshifting (PRF) studies by:
+ShiftSCAN was developed to advance research on mosaic translation and programmed ribosomal frameshifting. It has enabled the discrimination between chimeric proteins with unique sources in the genome and proteins that have multiple alternative sources, which is essential for their functional analysis. For biological context and related studies, see our publication: Çakır et al. (2024, preprint). The tool addresses critical challenges in programmed ribosomal frameshifting (PRF) studies by:
 - Identifying potential alternative loci for chimeric peptides
 - Differentiating between unique and multi-source chimeric origins
 - Detecting reverse complement translation events
